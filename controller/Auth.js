@@ -96,33 +96,3 @@ exports.resetPasswordRequest = async (req, res) => {
   }
 };
 
-exports.resetPassword = async (req, res) => {
-  const { email, password, token } = req.body;
-
-  const user = await User.findOne({ email: email, resetPasswordToken: token });
-  if (user) {
-    const salt = crypto.randomBytes(16);
-    crypto.pbkdf2(
-      req.body.password,
-      salt,
-      310000,
-      32,
-      'sha256',
-      async function (err, hashedPassword) {
-        user.password = hashedPassword;
-        user.salt = salt;
-        await user.save();
-        const subject = 'password successfully reset for e-commerce';
-        const html = `<p>Successfully able to Reset Password</p>`;
-        if (email) {
-          const response = await sendMail({ to: email, subject, html });
-          res.json(response);
-        } else {
-          res.sendStatus(400);
-        }
-      }
-    );
-  } else {
-    res.sendStatus(400);
-  }
-};
