@@ -79,5 +79,12 @@ exports.fetchOrdersByUser = async (req, res) => {
       query = query.skip(pageSize * (page - 1)).limit(pageSize);
     }
   
-    
+  try {
+      const docs = await query.exec();
+      res.set('X-Total-Count', totalDocs);
+      res.status(200).json(docs);
+    } catch (err) {
+      res.status(400).json(err);
+    }
+  };  
   
